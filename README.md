@@ -1,6 +1,6 @@
 # Event Nexus
-[![Build Status](https://travis-ci.org/elidoran/node-event-nexus.svg?branch=master)](https://travis-ci.org/elidoran/node-event-nexus)
-[![Dependency Status](https://gemnasium.com/elidoran/node-event-nexus.png)](https://gemnasium.com/elidoran/node-event-nexus)
+[![Build Status](https://travis-ci.org/elidoran/event-nexus.svg?branch=master)](https://travis-ci.org/elidoran/event-nexus)
+[![Dependency Status](https://gemnasium.com/elidoran/event-nexus.png)](https://gemnasium.com/elidoran/event-nexus)
 [![npm version](https://badge.fury.io/js/event-nexus.svg)](http://badge.fury.io/js/event-nexus)
 
 A central object for event listening and emitting with advanced execution controls.

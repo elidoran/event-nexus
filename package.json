@@ -1,0 +1,44 @@
+{
+  "name": "event-nexus",
+  "version": "0.1.0",
+  "description": "A central object for event listening and emitting with advanced execution controls",
+  "main": "lib",
+  "keywords": [
+    "nexus",
+    "event",
+    "emitter",
+    "sync",
+    "async",
+    "flow control",
+    "order",
+    "ordered",
+    "EventEmitter",
+    "EventEmitter2",
+    "EventEmitter3"
+  ],
+  "author": "Eli Doran <eli+npm@elidoran.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "coffee --bare --compile lib",
+    "clean": "rm -rf lib/*.js",
+    "prepublish": "npm run build",
+    "postpublish": "npm run clean",
+    "test": "mocha --compilers coffee:coffee-script/register --reporter spec --bail --check-leaks test/lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/elidoran/node-event-nexus.git"
+  },
+  "bugs": "http://github.com/elidoran/node-event-nexus/issues",
+  "devDependencies": {
+    "coffee-script": "^1.11.1",
+    "mocha": "^3.1.2"
+  },
+  "dependencies": {
+    "chain-builder": "^0.10.0",
+    "ordering": "^0.5.0"
+  },
+  "engines": {
+    "node": ">=0.12"
+  }
+}

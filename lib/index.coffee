@@ -38,13 +38,8 @@ class Nexus
     @_remove = {}
 
     # allow customizing the context passed to a chain run
-    # also add a `nexus` property with `this` in it
     if options?.contextBase?
-      options.contextBase.nexus = this
       @_contextBase = options.contextBase
-
-    # otherwise create our own with the `nexus` property
-    else @_contextBase = nexus:this
 
 
   # simple existence check returns a boolean
@@ -122,26 +117,30 @@ class Nexus
     # return for chaining...
     return this
 
-  emit: (event, args...) ->
+  emit: (eventName, eventObject) ->
 
     # if there's a chain for this event
-    if @chains[event]?
+    if @chains[eventName]?
 
-      # TODO:
-      #   provide the `base` to the chain.run() as an option
-      #   provide the event and args as a property description to chain.run()
-
-      # create a new context object based on the stored context 'base'
-      context = Object.create @_contextBase
-
-      # add the current event to emit and its args
-      context.event = name: event, args: args
-
-      # then call the chain with the context
-      @chains[event].run context:context
+      # add the event object to the context via `props` in case the `base`
+      # is provided by the nexus or a custom base given when the chain was
+      # created
+      @chains[eventName].run
+        # context: no context cuz we want base+props to be used
+        props:
+          eventName: # let's provide the event name as well.
+            value       : eventName
+            writable    : false
+            configurable: false
+            enumerable  : true
+          event:
+            value       : eventObject
+            writable    : true
+            configurable: true
+            enumerable  : true
 
     # if there's no chain for the event, return a result informing them
-    else result:true, reason:'no chain for event', event:event
+    else result:true, reason:'no chain for event', event:eventName
 
 
   # this is used by `_makeChain`.
@@ -155,6 +154,13 @@ class Nexus
   # pulled from `on()` to be overridable.
   # and, then, I added the `chain()` function which also uses this.
   _makeChain: (event, options) ->
+
+      # if this nexus has a context base and the options don't specify a base,
+      # then specify the nexus' base.
+      if @_contextBase? and not options?.base?
+        if options? then options.base = @_contextBase # add into existing
+        else options = base: @_contextBase            # make the options
+      # otherwise, allow things to proceed with options as they are
 
       # use the local function which uses `buildChain` by default.
       chain = @_buildChain options

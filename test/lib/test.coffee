@@ -182,78 +182,77 @@ describe 'test nexus', ->
     it 'should call listener via its event chain', ->
 
       called = false
+      callName = null
       callArg = null
       arg = 'some arg'
       hasArg = false
       fn = (control, context) ->
         called = true
-        callArg = context?.event?.args?[0]
+        callName = context.eventName
+        callArg = context.event
 
       nexus.on 'test', fn
 
       assert.equal nexus?.chains?.test.array.length, 1
+      assert.strictEqual nexus?.chains?.test.array[0], fn
 
       result = nexus.emit 'test', arg
 
       assert result?.result
       assert called, 'should call listener'
-      assert callArg, arg, 'arg should match'
+      assert.equal callName, 'test', 'event name should match'
+      assert.equal callArg, arg, 'arg should match'
 
     it 'should call listener via its event chain', ->
 
-      arg1 = 'some arg'
-      arg2 = 'another arg'
+      eventObject =
+        one: 'some arg'
+        two: 'another arg'
 
       called1 = false
-      firstCallArg1 = null
-      secondCallArg1 = null
+      object1 = null
 
       fna = (control, context) ->
         called1 = true
-        [ firstCallArg1, secondCallArg1 ] = context?.event?.args
+        object1 = context?.event
 
       called2 = false
-      firstCallArg2 = null
-      secondCallArg2 = null
+      object2 = null
 
       fnb = (control, context) ->
         called2 = true
-        [ firstCallArg2, secondCallArg2 ] = context?.event?.args
+        object2 = context?.event
 
       nexus.on 'test', fna, fnb
 
       assert.equal nexus?.chains?.test.array.length, 2
 
-      result = nexus.emit 'test', arg1, arg2
+      result = nexus.emit 'test', eventObject
 
       assert result?.result
 
       assert called1, 'should call first listener'
-      assert firstCallArg1, arg1, 'arg should match'
-      assert secondCallArg1, arg2, 'arg should match'
+      assert.strictEqual object1, eventObject, 'event object should match'
 
       assert called2, 'should call second listener'
-      assert firstCallArg2, arg1, 'arg should match'
-      assert secondCallArg2, arg2, 'arg should match'
+      assert.strictEqual object2, eventObject, 'event object should match'
 
 
   describe 'context base', ->
 
-    it 'should use base as prototype of new context', ->
+    it 'should use nexus base as prototype of new context', ->
 
       calledKey = null
-      calledArg = null
-      calledNexus = null
+      calledEvent = null
 
       base =
         key: 'value'
-        fn : (arg) ->
+        fn : (event) ->
           calledKey = @key
-          calledArg = arg
+          calledEvent = event
 
       listener = () ->
-        calledNexus = @nexus
-        @fn @event.args...
+        @fn @event
         return
 
       nexus = buildNexus contextBase:base
@@ -262,6 +261,44 @@ describe 'test nexus', ->
 
       nexus.emit 'test', 'somearg'
 
-      assert.strictEqual calledNexus, nexus
-      assert.equal calledArg, 'somearg'
+      assert.equal calledEvent, 'somearg'
       assert.equal calledKey, 'value'
+
+    it 'should use chain\'s base as prototype of new context', ->
+
+      calledKey = null
+      calledEvent = null
+      calledKey2 = null
+      calledEvent2 = null
+
+      base =
+        key: 'value'
+        fn : (event) ->
+          calledKey = @key
+          calledEvent = event
+
+      notUsedBase =
+        key2: 'value'
+        fn2 : (event) ->
+          calledKey2 = @key
+          calledEvent2 = event
+
+      listener = () ->
+        @fn @event
+        return
+
+      nexus = buildNexus contextBase:notUsedBase
+
+      # create the chain specifically to provide options with `base`
+      nexus.chain 'test', true, base:base
+
+      # now add a listener
+      nexus.on 'test', listener
+
+      nexus.emit 'test', 'somearg'
+
+      assert.equal calledEvent, 'somearg'
+      assert.equal calledKey, 'value'
+
+      assert.equal calledEvent2, undefined, 'shouldnt use the nexus base'
+      assert.equal calledKey2, undefined, 'shouldnt use the nexus base'

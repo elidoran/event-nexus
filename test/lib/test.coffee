@@ -55,7 +55,7 @@ describe 'test nexus', ->
       nexus.once 'test', fn1
 
       assert.strictEqual nexus?.chains?.test?.array?[0], fn1
-      assert.strictEqual nexus?._remove?.test?[0], fn1
+      assert.strictEqual nexus?.chains?.test?.__nexusRemovals?[0], fn1
 
     it 'with multiple listeners', ->
 
@@ -65,9 +65,9 @@ describe 'test nexus', ->
       assert.strictEqual nexus?.chains?.test?.array?[1], fn2
       assert.strictEqual nexus?.chains?.test?.array?[2], fn3
 
-      assert.strictEqual nexus?._remove?.test?[0], fn1
-      assert.strictEqual nexus?._remove?.test?[1], fn2
-      assert.strictEqual nexus?._remove?.test?[2], fn3
+      assert.strictEqual nexus?.chains?.test.__nexusRemovals?[0], fn1
+      assert.strictEqual nexus?.chains?.test.__nexusRemovals?[1], fn2
+      assert.strictEqual nexus?.chains?.test.__nexusRemovals?[2], fn3
 
     it 'with array of listeners', ->
 
@@ -77,9 +77,9 @@ describe 'test nexus', ->
       assert.strictEqual nexus?.chains?.test?.array?[1], fn2
       assert.strictEqual nexus?.chains?.test?.array?[2], fn3
 
-      assert.strictEqual nexus?._remove?.test?[0], fn1
-      assert.strictEqual nexus?._remove?.test?[1], fn2
-      assert.strictEqual nexus?._remove?.test?[2], fn3
+      assert.strictEqual nexus?.chains?.test.__nexusRemovals?[0], fn1
+      assert.strictEqual nexus?.chains?.test.__nexusRemovals?[1], fn2
+      assert.strictEqual nexus?.chains?.test.__nexusRemovals?[2], fn3
 
 
   describe 'off() removes listener', ->

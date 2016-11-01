@@ -5,21 +5,29 @@ buildChain = require 'chain-builder'
 # this is used to order the array of functions used by an event chain
 order      = require 'ordering'
 
+# mark a chain as *not* ordered when an add/remove occurs
+markChanged = (event) -> event.chain.__isOrdered = false
+
 # order the array before a chain run executes
-ensureOrdered = (started) ->
-  unless started.chain.__isOrdered
-    order started.chain.array
-    started.chain.__isOrdered = true
+ensureOrdered = (event) ->
+  unless event.chain.__isOrdered is true
+    order event.chain.array
+    event.chain.__isOrdered = true
 
 # remove any listeners registered for removal ('once' listeners)
-removeListeners = (removals, error, results) ->
-  if error? or removals?.length < 1 then return
+removeListeners = (error, results) ->
+  if error? then return
 
   chain = results.chain
+  removals = chain.__nexusRemovals
 
-  # each function in `removals` should be removed from the chain
-  # *and*, removed from the removals queue
-  chain.remove removals.pop() until removals.length is 0
+  if removals?.length > 0
+    # each function in `removals` should be removed from the chain
+    # *and*, removed from the removals queue, so, get via pop()
+    chain.remove removals.pop() until removals.length is 0
+
+  return
+
 
 class Nexus
   constructor: (options) ->
@@ -44,9 +52,10 @@ class Nexus
 
   # gets the actual chain.
   # by default it will create it when it doesn't exist.
-  chain: (event, create = true) ->
+  chain: (event, create = true, options) ->
     chain = @chains?[event]
-    unless chain? or create is false then chain = @_makeChain event
+    unless chain? or create is false
+      chain = @chains?[event] = @_makeChain event, options
     return chain
 
   on: (event, listeners...) ->
@@ -54,9 +63,7 @@ class Nexus
     if Array.isArray listeners[0] then listeners = listeners[0]
 
     # ensure we have a chain to add to
-    if @chains[event]? then chain = @chains[event]
-    else
-      chain = @chains[event] = @_makeChain event
+    chain = @chain event, true
 
     # gather into a single add without duplicates
     add = []
@@ -76,15 +83,19 @@ class Nexus
     # unwrap array
     if Array.isArray listeners[0] then listeners = listeners[0]
 
-    removals = @_remove[event]
+    # ensure we have a chain to add to
+    chain = @chain event, true
 
-    # add it to the remove queue
-    if removals? then removals.splice removals.length, 0, listeners...
+    # # store the listeners for removal
+    #
+    # either: 1. add it to the existing remove queue
+    if chain.__nexusRemovals?
+      chain.__nexusRemovals.splice removals.length, 0, listeners...
 
-    # or create the queue using this array
-    else @_remove[event] = listeners # TODO: slice() to copy?
+    # or, 2. create the queue using this array
+    else chain.__nexusRemovals = listeners
 
-    # add their listener
+    # add their listeners
     @on event, listeners...
 
     # return for chaining...
@@ -143,16 +154,12 @@ class Nexus
   # it's also possible they may want to override this functionality, so, it's
   # pulled from `on()` to be overridable.
   # and, then, I added the `chain()` function which also uses this.
-  _makeChain: (event) ->
+  _makeChain: (event, options) ->
 
       # use the local function which uses `buildChain` by default.
-      chain = @_buildChain()
-
-      # prep a removals array for this event so it can be bound below.
-      @_remove[event] ?= []
+      chain = @_buildChain options
 
       # watch this chain for changes. when changed, set a marker
-      markChanged = -> chain.__isOrdered = false
 
       # add listner to both add/remove events
       chain.on 'add', markChanged
@@ -166,8 +173,7 @@ class Nexus
       chain.on 'start', ensureOrdered
 
       # when a chain execution is done, remove any listeners queued for removal
-      # Note: the removal array must already exist so it can be bound as an arg
-      chain.on 'done', removeListeners.bind this, @_remove[event]
+      chain.on 'done', removeListeners
 
 # export a function which creates a Strung instance
 module.exports = (options) -> new Nexus options

@@ -1,6 +1,6 @@
 {
   "name": "event-nexus",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A central object for event listening and emitting with advanced execution controls",
   "main": "lib",
   "keywords": [

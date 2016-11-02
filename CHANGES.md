@@ -1,3 +1,7 @@
+0.2.2 - Released 2016/11/01
+
+1. update chain-builder dep
+
 0.2.1 - Released 2016/11/01
 
 1. updated README to reflect changes in 0.2.0

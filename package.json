@@ -35,7 +35,7 @@
     "mocha": "^3.1.2"
   },
   "dependencies": {
-    "chain-builder": "^0.11.0",
+    "chain-builder": "^0.11.1",
     "ordering": "^0.5.0"
   },
   "engines": {

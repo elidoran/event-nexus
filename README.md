@@ -41,11 +41,19 @@ nexus.on('some event', function() {
   console.log('context base:', this.some);
 });
 
+// to use a custom context base for an individual event chain,
+// instead of all event chains, create the event chain manually
+// and specify the options:
+// (true means create if it isn't created)
+nexus.chain('new event name', true, {
+  base: { the: 'custom base' }
+});
+
 // you can do a `once` listener as well.
 // or, if you want it to execute 2 or more times depending on something:
 nexus.on('some event', function(control) {
   // if we have run enough times we're no longer needed...
-  if (this.something) {
+  if (this.event.something) {
     control.remove();
     // or add a reason for info purposes:
     control.remove('I am no longer needed');
@@ -65,8 +73,17 @@ nexus.clear('event name');
 // OR: remove all event listeners for *all* events:
 nexus.clear();
 
-// finally, emit events the usual way with a name and, optionally, args
-nexus.emit('some event', arg1, arg2, arg3);
+// finally, emit event with a name and, optionally, an event object
+var eventObject = { some: 'thing' };
+nexus.emit('eventing', eventObject);
+// a listener for the above example:
+nexus.on('eventing', function() {
+  // this.eventName == 'eventing'
+  // this.event == eventObject
+  // the below prints:
+  //   eventing some thing
+  console.log(this.eventName, 'some', this.event.some);
+});
 ```
 
 ## API
@@ -77,7 +94,7 @@ Nexus functions:
 2. **once** - same as `on()` except they run only once
 3. **off** - remove a listener
 4. **clear** - remove all listeners for all events, or, for a specific event
-5. **emit** - usual emitter accepts event name and args.
+5. **emit** - usual emitter accepts event name and an event object
 
 ## TODO
 

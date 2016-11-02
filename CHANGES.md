@@ -1,3 +1,6 @@
+0.2.1 - Released 2016/11/01
+
+1. updated README to reflect changes in 0.2.0
 
 0.2.0 - Released 2016/11/01
 
@@ -10,6 +13,7 @@
 7. changed `emit()` to accept all args (params 2+) as a single "event object" (param 2)
 8. changed `emit()` to *not* do `Object.create()` and instead defer to the chain doing that (see items 5 and 6 above)
 9. altered `chain.run()` calls to provide event name and object as `props` which enhance the context and allow all the `base` stuff to be separate
+
 
 0.1.0 - Released 2016/10/29
 

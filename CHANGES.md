@@ -1,3 +1,19 @@
+0.3.0 - Released 2017/04/30
+
+1. drop Node 0.12 and add 7
+2. cache `node_modules` in Travis CI
+3. submit coverage to coveralls via Travis CI
+4. ignore usual directories for npm publish
+5. add 2017 to LICENSE
+6. add linting with coffeelint
+7. add code coverage with istanbul and coffee-coverage
+8. fixed repo URL in package.json
+9. update deps
+10. add coverage badge to README
+11. link to license from README
+12. add link to eventa in README
+
+
 0.2.2 - Released 2016/11/01
 
 1. update chain-builder dep

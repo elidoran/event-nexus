@@ -1,4 +1,11 @@
-0.3.0 - Released 2017/04/30
+## 0.3.1 - Released 2017/04/30
+
+1. replace CoffeeScript slicing on arguments because it isn't optimizable
+2. use @flatten/array instead of unwrapping only the first argument
+3. fix lint issues
+4. made release header lines actual headers
+
+## 0.3.0 - Released 2017/04/30
 
 1. drop Node 0.12 and add 7
 2. cache `node_modules` in Travis CI
@@ -14,15 +21,15 @@
 12. add link to eventa in README
 
 
-0.2.2 - Released 2016/11/01
+## 0.2.2 - Released 2016/11/01
 
 1. update chain-builder dep
 
-0.2.1 - Released 2016/11/01
+## 0.2.1 - Released 2016/11/01
 
 1. updated README to reflect changes in 0.2.0
 
-0.2.0 - Released 2016/11/01
+## 0.2.0 - Released 2016/11/01
 
 1. generified the removal listener by moving removals onto chains and using chain ref in event
 2. generified the ordering listeners by using chain ref in event
@@ -35,6 +42,6 @@
 9. altered `chain.run()` calls to provide event name and object as `props` which enhance the context and allow all the `base` stuff to be separate
 
 
-0.1.0 - Released 2016/10/29
+## 0.1.0 - Released 2016/10/29
 
 1. initial working version with tests

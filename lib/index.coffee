@@ -1,3 +1,5 @@
+# flatten arrays fast
+flatten = require '@flatten/array'
 
 # this module is used to build each event chain
 buildChain = require 'chain-builder'
@@ -45,17 +47,23 @@ class Nexus
   # simple existence check returns a boolean
   hasChain: (event) -> @chains?[event]?
 
+
   # gets the actual chain.
   # by default it will create it when it doesn't exist.
   chain: (event, create = true, options) ->
+
     chain = @chains?[event]
     unless chain? or create is false
       chain = @chains?[event] = @_makeChain event, options
     return chain
 
-  on: (event, listeners...) ->
-    # unwrap array
-    if Array.isArray listeners[0] then listeners = listeners[0]
+
+  on: (event) ->
+
+    # optimization friendly way to convert `arguments`
+    listeners = new Array arguments.length - 1
+    listeners[i - 1] = arguments[i] for i in [1 ... arguments.length]
+    flatten listeners
 
     # ensure we have a chain to add to
     chain = @chain event, true
@@ -63,20 +71,23 @@ class Nexus
     # gather into a single add without duplicates
     add = []
     for listener in listeners
-      unless listener in chain.array then add.push listener
+      unless listener in chain.array then add[add.length] = listener
 
     # now add them all
-    result = chain.add add...
+    result = chain.add.apply chain, add
 
     if result?.error? then return result
 
     # return for chaining...
     return this
 
-  once: (event, listeners...) ->
 
-    # unwrap array
-    if Array.isArray listeners[0] then listeners = listeners[0]
+  once: (event) ->
+
+    # optimization friendly way to convert `arguments`
+    listeners = new Array arguments.length - 1
+    listeners[i - 1] = arguments[i] for i in [1 ... arguments.length]
+    flatten listeners
 
     # ensure we have a chain to add to
     chain = @chain event, true
@@ -85,16 +96,17 @@ class Nexus
     #
     # either: 1. add it to the existing remove queue
     if chain.__nexusRemovals?
-      chain.__nexusRemovals.splice removals.length, 0, listeners...
+      chain.__nexusRemovals.push.apply chain.__nexusRemovals, listeners
 
     # or, 2. create the queue using this array
     else chain.__nexusRemovals = listeners
 
     # add their listeners
-    @on event, listeners...
+    @on.apply this, [event, listeners]
 
     # return for chaining...
     return this
+
 
   # remove listener from event chain
   off: (event, listener) ->
@@ -106,6 +118,7 @@ class Nexus
     # return for chaining...
     return this
 
+
   # remove all listeners (optionally for a specified event)
   clear: (event) ->
 
@@ -116,6 +129,7 @@ class Nexus
 
     # return for chaining...
     return this
+
 
   emit: (eventName, eventObject) ->
 
@@ -148,7 +162,8 @@ class Nexus
   # nexus builds a chain. the `buildChain` is the `chain-bulider` module's
   # exported builder function. it's possible someone may want to replace
   # that with their own chain building process...
-  _buildChain: (args...) -> buildChain args...
+  _buildChain: -> buildChain.apply this, arguments
+
 
   # it's also possible they may want to override this functionality, so, it's
   # pulled from `on()` to be overridable.
@@ -180,6 +195,8 @@ class Nexus
 
       # when a chain execution is done, remove any listeners queued for removal
       chain.on 'done', removeListeners
+
+
 
 # export a function which creates a Strung instance
 module.exports = (options) -> new Nexus options

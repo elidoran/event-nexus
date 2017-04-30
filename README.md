@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/elidoran/event-nexus.svg?branch=master)](https://travis-ci.org/elidoran/event-nexus)
 [![Dependency Status](https://gemnasium.com/elidoran/event-nexus.png)](https://gemnasium.com/elidoran/event-nexus)
 [![npm version](https://badge.fury.io/js/event-nexus.svg)](http://badge.fury.io/js/event-nexus)
+[![Coverage Status](https://coveralls.io/repos/github/elidoran/event-nexus/badge.svg?branch=master)](https://coveralls.io/github/elidoran/event-nexus?branch=master)
 
 A central object for event listening and emitting with advanced execution controls.
 
@@ -11,6 +12,7 @@ See [ordering](https://www.npmjs.com/package/ordering) for how event listeners a
 
 See [needier](https://www.npmjs.com/package/needier) for `ordering` sorts based on dependencies.
 
+See [eventa](https://www.npmjs.com/package/eventa) for another event system.
 
 ## Install
 
@@ -25,14 +27,14 @@ npm install event-nexus --save
 // get the module's builder function
 var buildNexus = require('event-nexus')
 
-  // the only build option is `contextBase`.
-  // it can have constants as well as functions
-  // anything in it will be available in the execution context
-  // given to each event listener function
-  , buildOptions = { contextBase: {some: 'stuff'} }
+// the only build option is `contextBase`.
+// it can have constants as well as functions
+// anything in it will be available in the execution context
+// given to each event listener function
+var buildOptions = { contextBase: {some: 'stuff'} }
 
-  // build the nexus with the options
-  , nexus = buildNexus(buildOptions);
+// build the nexus with the options
+var nexus = buildNexus(buildOptions);
 
 // add an event listener
 nexus.on('some event', function() {
@@ -100,4 +102,4 @@ Nexus functions:
 
 1. accept a callback in `emit()` which is added as a one-time 'done' event listener on the chain.
 
-## MIT License
+## [MIT License](LICENSE)

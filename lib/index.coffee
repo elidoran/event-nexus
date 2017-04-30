@@ -125,7 +125,7 @@ class Nexus
     # for a specific event, try to clear its chain. it may not exist
     if event? then @chains?[event]?.clear?()
 
-    else chain.clear() for event,chain of @chains
+    else chain.clear() for event, chain of @chains
 
     # return for chaining...
     return this
@@ -170,31 +170,31 @@ class Nexus
   # and, then, I added the `chain()` function which also uses this.
   _makeChain: (event, options) ->
 
-      # if this nexus has a context base and the options don't specify a base,
-      # then specify the nexus' base.
-      if @_contextBase? and not options?.base?
-        if options? then options.base = @_contextBase # add into existing
-        else options = base: @_contextBase            # make the options
-      # otherwise, allow things to proceed with options as they are
+    # if this nexus has a context base and the options don't specify a base,
+    # then specify the nexus' base.
+    if @_contextBase? and not options?.base?
+      if options? then options.base = @_contextBase # add into existing
+      else options = base: @_contextBase            # make the options
+    # otherwise, allow things to proceed with options as they are
 
-      # use the local function which uses `buildChain` by default.
-      chain = @_buildChain options
+    # use the local function which uses `buildChain` by default.
+    chain = @_buildChain options
 
-      # watch this chain for changes. when changed, set a marker
+    # watch this chain for changes. when changed, set a marker
 
-      # add listner to both add/remove events
-      chain.on 'add', markChanged
-      chain.on 'remove', markChanged
+    # add listner to both add/remove events
+    chain.on 'add', markChanged
+    chain.on 'remove', markChanged
 
-      # add a start listener which does ordering if __isOrdered is false.
-      # this way, we aren't ordering over and over again as things are
-      # added and removed. instead, we order it before executing the chain
-      # Note: this is possible because chain-builder emits 'start' before
-      # beginning to execute the chain.
-      chain.on 'start', ensureOrdered
+    # add a start listener which does ordering if __isOrdered is false.
+    # this way, we aren't ordering over and over again as things are
+    # added and removed. instead, we order it before executing the chain
+    # Note: this is possible because chain-builder emits 'start' before
+    # beginning to execute the chain.
+    chain.on 'start', ensureOrdered
 
-      # when a chain execution is done, remove any listeners queued for removal
-      chain.on 'done', removeListeners
+    # when a chain execution is done, remove any listeners queued for removal
+    chain.on 'done', removeListeners
 
 
 
